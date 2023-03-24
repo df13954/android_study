@@ -1,0 +1,24 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        // 添加此库
+        maven { url "https://api.xposed.info/" }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+}
+rootProject.name = "My Application"
+include ':app'
+include ':nativelib'
