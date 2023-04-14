@@ -7,16 +7,19 @@ import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.lang.reflect.Method
+import android.os.Bundle
 
 
 class hook : IXposedHookLoadPackage {
     @Throws(Throwable::class)
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
+//        if (lpparam.packageName == "com.example.android_study") { // 指定目标应用的包名
         if (lpparam.packageName == "com.ss.android.ugc.trill") { // 指定目标应用的包名
             Log.d(TAG, "Hooking into target app: " + lpparam.packageName)
-            set_language(lpparam.classLoader)
+
+//            set_language(lpparam.classLoader)
 //            hook_gaid(lpparam.classLoader)
-            http_params(lpparam.classLoader)
+//            http_params(lpparam.classLoader)
         }
     }
 
