@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId = "thouger.study"
-        minSdk = 26
-        targetSdk = 33
+        minSdk = 29
+        targetSdk = 29
         versionCode = 1
         versionName = "1.0"
 
@@ -59,6 +59,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    ndkVersion = "25.2.9519653"
 }
 
 dependencies {
