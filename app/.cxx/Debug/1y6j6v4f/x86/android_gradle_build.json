@@ -1,0 +1,38 @@
+{
+  "buildFiles": [
+    "/Users/thouger/Documents/code/test/android_study/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/thouger/Documents/data/android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/thouger/Documents/code/test/android_study/app/.cxx/Debug/1y6j6v4f/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/thouger/Documents/data/android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/thouger/Documents/code/test/android_study/app/.cxx/Debug/1y6j6v4f/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "study::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "study",
+      "output": "/Users/thouger/Documents/code/test/android_study/app/build/intermediates/cxx/Debug/1y6j6v4f/obj/x86/libstudy.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/thouger/Documents/data/android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/thouger/Documents/data/android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

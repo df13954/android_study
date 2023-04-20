@@ -1,0 +1,4 @@
+# ninja log v5
+0	417	1681957238991604846	CMakeFiles/study.dir/native-lib.cpp.o	6e7d410d805ad368
+418	479	1681957239043331844	/Users/thouger/Documents/code/thouger/app/build/intermediates/cxx/Debug/1y6j6v4f/obj/arm64-v8a/libstudy.so	e931340d63fd2be6
+1	314	1681957642214647226	/Users/thouger/Documents/code/thouger/app/build/intermediates/cxx/Debug/1y6j6v4f/obj/arm64-v8a/libstudy.so	e931340d63fd2be6

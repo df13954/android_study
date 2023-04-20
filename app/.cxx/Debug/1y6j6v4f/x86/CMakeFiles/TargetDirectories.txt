@@ -1,0 +1,3 @@
+/Users/thouger/Documents/code/test/android_study/app/.cxx/Debug/1y6j6v4f/x86/CMakeFiles/study.dir
+/Users/thouger/Documents/code/test/android_study/app/.cxx/Debug/1y6j6v4f/x86/CMakeFiles/edit_cache.dir
+/Users/thouger/Documents/code/test/android_study/app/.cxx/Debug/1y6j6v4f/x86/CMakeFiles/rebuild_cache.dir

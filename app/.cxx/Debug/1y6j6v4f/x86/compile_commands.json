@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/thouger/Documents/code/test/android_study/app/.cxx/Debug/1y6j6v4f/x86",
+  "command": "/Users/thouger/Documents/data/android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=i686-none-linux-android26 --sysroot=/Users/thouger/Documents/data/android/sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dstudy_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -o CMakeFiles/study.dir/native-lib.cpp.o -c /Users/thouger/Documents/code/test/android_study/app/src/main/cpp/native-lib.cpp",
+  "file": "/Users/thouger/Documents/code/test/android_study/app/src/main/cpp/native-lib.cpp"
+}
+]
