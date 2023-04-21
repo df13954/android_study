@@ -14,7 +14,7 @@
  *  kotlin.jvm.internal.Ref$BooleanRef
  *  org.jetbrains.annotations.NotNull
  */
-package thouger.study;
+package thouger.hook;
 
 import android.util.Log;
 import de.robv.android.xposed.IXposedHookLoadPackage;

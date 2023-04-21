@@ -50,9 +50,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     externalNativeBuild {
         cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
+            path = file("src/main/CMakeLists.txt")
             version = "3.22.1"
         }
     }

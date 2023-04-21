@@ -1,4 +1,4 @@
-package thouger.study;//package thouger;
+package thouger.hook;//package thouger;
 //
 //import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 //

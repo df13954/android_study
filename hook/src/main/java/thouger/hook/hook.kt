@@ -1,4 +1,4 @@
-package thouger.study
+package thouger.hook
 
 import android.util.Log
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -13,7 +13,7 @@ class hook : IXposedHookLoadPackage {
     @Throws(Throwable::class)
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
         Log.d("thouger","look for packagename: " + lpparam.packageName)
-        if (lpparam.packageName == "com.ss.android.ugc.trill") { // 指定目标应用的包名
+        if (lpparam.packageName == "thouger.study") { // 指定目标应用的包名
             Log.d("thouger","Hooking into target app: " + lpparam.packageName)
             hook_method(lpparam.classLoader)
         }
@@ -28,14 +28,15 @@ class hook : IXposedHookLoadPackage {
     }
 
     fun hook_method(classLoader: ClassLoader) {
-        val clazz = XposedHelpers.findClass("android.provider.Settings.NameValueCache", classLoader)
+        val clazz = XposedHelpers.findClass("thouger.study.MainActivity", classLoader)
         Log.d("hook_method","target class: " + clazz.name)
         val className = clazz.name
         val m: Array<Method> = clazz.getDeclaredMethods()
         for (method in m) {
             val classMethodName = method.name
             Log.d("hook_method","target method: " + method.name)
-            if ("getStringForUser" != classMethodName) {
+            //-----------------重要----------------修改函数名
+            if ("onCreate" != classMethodName) {
                 continue
             }
             Log.d("hook_method","find method: " + method.name)

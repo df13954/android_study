@@ -3,6 +3,7 @@ package thouger.study
 import android.Manifest.permission.READ_PHONE_STATE
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -10,11 +11,14 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
+import android.opengl.GLES20
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Environment
@@ -80,9 +84,6 @@ class DeviceInfoUtils {
 
     val TIME: Long
         get() = Build.TIME
-
-    val UNKNOWN: String
-        get() = Build.UNKNOWN
 
     val HARDWARE: String
         get() = Build.HARDWARE
@@ -190,9 +191,6 @@ class DeviceInfoUtils {
         // 打印设备当前时间
         val time = TIME
 
-        // 打印设备版本号
-        val unknown = UNKNOWN
-
         // 打印设备版本类型
         val hardware = HARDWARE
 
@@ -251,10 +249,16 @@ class DeviceInfoUtils {
         // 获取当前设备的语言变种
         val variant = getVariant()
 
+        // 获得蓝牙信息
+        val Bluetooth = getBluetooth(context)
+
         // 获取当前设备所有的系统属性
         val AllSystemProperties = getAllSystemProperties()
 
         val sensor = getSensor(context)
+
+        getOpenGL()
+        getSIm(context)
 
         // 获得所有
         map["country"] = country
@@ -285,7 +289,6 @@ class DeviceInfoUtils {
         map["id"] = id
         map["tags"] = tags
         map["time"] = time.toString()
-        map["unknown"] = unknown
         map["hardware"] = hardware
         map["buildUser"] = buildUser
         map["buildHost"] = buildHost
@@ -310,6 +313,8 @@ class DeviceInfoUtils {
         map["hasNFC"] = hasNFC.toString()
         map["countryCode"] = countryCode
         map["variant"] = variant
+        map["Bluetooth"] = Bluetooth
+
         for (key in DisplayMetrics.keys) {
             map[key] = DisplayMetrics[key].toString()
         }
@@ -327,8 +332,18 @@ class DeviceInfoUtils {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val sensorList = sensorManager!!.getSensorList(Sensor.TYPE_ALL)
         for (sensor in sensorList) {
-            val vendor = sensor.vendor
-            Timber.d("vendor : $vendor")
+            val sensorName = sensor.name
+            val sensorValue = sensorManager!!.getDefaultSensor(sensor.type)?.let {
+                val sensorListener = object : SensorEventListener {
+                    override fun onSensorChanged(event: SensorEvent) {
+                        Timber.d("sensor value changed: ${event.values[0]}")
+                        sensorManager.unregisterListener(this)
+                    }
+                    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+                }
+                sensorManager.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
+            }
+            map.put(sensorName, sensorValue.toString())
         }
         return map
     }
@@ -358,6 +373,14 @@ class DeviceInfoUtils {
             Build.SERIAL
         }
     }
+
+    fun getBatteryLevel(context: Context): Int {
+        val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val level = intent!!.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+        val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        return (level * 100 / scale.toFloat()).toInt()
+    }
+
 
     private fun isBatteryCharging(context: Context): Any {
         val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
@@ -460,21 +483,23 @@ class DeviceInfoUtils {
     }
 
     //tiktok没调用
-//    fun getOpenGL(){
-//        val version = GLES20.glGetString(GLES20.GL_VERSION)
-//        val maxTextureSize = IntArray(1)
-//        GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0)
-//        val extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS)
-//        val viewport = IntArray(4)
-//        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
-//        Log.d(TAG, "Viewport size: " + viewport[2] + "x" + viewport[3])
-//        Log.d(TAG, "Supported texture formats: $extensions")
-//        Log.d(TAG, "Max texture size: " + maxTextureSize[0])
-//        Log.d(TAG, "OpenGL ES version: $version")
-//    }
+    fun getOpenGL(){
+        val version = GLES20.glGetString(GLES20.GL_VERSION)
+        val maxTextureSize = IntArray(1)
+        GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0)
+        val extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS)
+        val viewport = IntArray(4)
+        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
+        Timber.d("Viewport size: " + viewport[2] + "x" + viewport[3])
+        Timber.d("Supported texture formats: $extensions")
+        Timber.d("Max texture size: " + maxTextureSize[0])
+        Timber.d("OpenGL ES version: $version")
+        Timber.d("")
+    }
 
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.R)
+    //没插卡没法测试
     fun getSIm(context: Context): String {
         val subscriptionManager =
             context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager?
@@ -482,7 +507,7 @@ class DeviceInfoUtils {
         Timber.d("activeSimCount:"+activeSimCount)
 
         val activeSubList = subscriptionManager.activeSubscriptionInfoList
-        if (activeSubList != null) {
+        if (activeSubList.isNotEmpty()) {
             for (subscriptionInfo in activeSubList) {
                 val simSlotIndex = subscriptionInfo.simSlotIndex
                 val displayName = subscriptionInfo.displayName.toString()
@@ -494,7 +519,7 @@ class DeviceInfoUtils {
             }
         }
         val allSubList: List<SubscriptionInfo> = subscriptionManager.completeActiveSubscriptionInfoList
-        if (allSubList != null) {
+        if (allSubList.isNotEmpty()) {
             for (subscriptionInfo in allSubList) {
                 val simSlotIndex = subscriptionInfo.simSlotIndex
                 val displayName = subscriptionInfo.displayName.toString()
@@ -506,14 +531,17 @@ class DeviceInfoUtils {
             }
         }
         val accessList = subscriptionManager.accessibleSubscriptionInfoList
-        for(subscriptionInfo in accessList){
-            val simSlotIndex = subscriptionInfo.simSlotIndex
-            val displayName = subscriptionInfo.displayName.toString()
-            val carrierName = subscriptionInfo.carrierName.toString()
-            val iccId = subscriptionInfo.iccId
-            val countryIso = subscriptionInfo.countryIso
-            Timber.d("simSlotIndex: $simSlotIndex, displayName: $displayName, carrierName: $carrierName, iccId: $iccId, countryIso: $countryIso"
-            )
+        if (accessList.isNotEmpty()) {
+            for (subscriptionInfo in accessList) {
+                val simSlotIndex = subscriptionInfo.simSlotIndex
+                val displayName = subscriptionInfo.displayName.toString()
+                val carrierName = subscriptionInfo.carrierName.toString()
+                val iccId = subscriptionInfo.iccId
+                val countryIso = subscriptionInfo.countryIso
+                Timber.d(
+                    "simSlotIndex: $simSlotIndex, displayName: $displayName, carrierName: $carrierName, iccId: $iccId, countryIso: $countryIso"
+                )
+            }
         }
         return ""
     }
@@ -563,6 +591,11 @@ class DeviceInfoUtils {
             context.contentResolver,
             Settings.Secure.ANDROID_ID
         )
+    }
+
+    fun getBluetooth(context: Context): String {
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        return bluetoothAdapter.address
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -691,14 +724,7 @@ class DeviceInfoUtils {
                 }
             }
         }
-        return "Unknown"
-    }
-
-    fun getBatteryLevel(context: Context): Int {
-        val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        val level = intent!!.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-        val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-        return (level * 100 / scale.toFloat()).toInt()
+        return "Unknown Network"
     }
 
     fun getScreenDensity(context: Context): Float {

@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "thouger"
 include(":app")
- 
+include(":hook")

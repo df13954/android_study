@@ -35,13 +35,21 @@ class MainActivity : AppCompatActivity() {
 
         Timber.plant(Timber.DebugTree())
 
-//        System.loadLibrary("native_hook")
 
 //        Timber.d("检测授权")
-//        checkAndRequestLocationPermissions()
+        checkAndRequestLocationPermissions()
 
         val device_info = DeviceInfoUtils()
-        val map = device_info.printALL(this)
+//        val map = device_info.printALL(this)
+
+        //内存漫游
+        val choose = ChooseUtils.choose(MainActivity::class.java)
+        if (choose != null) {
+            Timber.d("当前class的个数: ${choose.size}")
+            for (i in choose.indices) {
+                Timber.d("当前class是: ${choose[i]}")
+            }
+        }
 
 //        val fileName = "device_info.json-"+System.currentTimeMillis()
 //        fileUtils().saveFile(this, fileName, map)
