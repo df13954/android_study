@@ -20,8 +20,11 @@ import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import android.provider.Settings
+import android.telephony.SubscriptionInfo
+import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
@@ -251,6 +254,8 @@ class DeviceInfoUtils {
         // 获取当前设备所有的系统属性
         val AllSystemProperties = getAllSystemProperties()
 
+        val sensor = getSensor(context)
+
         // 获得所有
         map["country"] = country
         map["language"] = language
@@ -313,6 +318,17 @@ class DeviceInfoUtils {
         }
         for(key in map.keys){
             Timber.d(key + " : " + map[key])
+        }
+        return map
+    }
+
+    private fun getSensor(context: Context): MutableMap<String, String> {
+        val map: MutableMap<String, String> = HashMap()
+        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensorList = sensorManager!!.getSensorList(Sensor.TYPE_ALL)
+        for (sensor in sensorList) {
+            val vendor = sensor.vendor
+            Timber.d("vendor : $vendor")
         }
         return map
     }
@@ -441,6 +457,65 @@ class DeviceInfoUtils {
         map["d_dpi"] = d_dpi
         map["size"] = size
         return map
+    }
+
+    //tiktok没调用
+//    fun getOpenGL(){
+//        val version = GLES20.glGetString(GLES20.GL_VERSION)
+//        val maxTextureSize = IntArray(1)
+//        GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0)
+//        val extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS)
+//        val viewport = IntArray(4)
+//        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0)
+//        Log.d(TAG, "Viewport size: " + viewport[2] + "x" + viewport[3])
+//        Log.d(TAG, "Supported texture formats: $extensions")
+//        Log.d(TAG, "Max texture size: " + maxTextureSize[0])
+//        Log.d(TAG, "OpenGL ES version: $version")
+//    }
+
+    @SuppressLint("MissingPermission")
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun getSIm(context: Context): String {
+        val subscriptionManager =
+            context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager?
+        val activeSimCount = subscriptionManager!!.activeSubscriptionInfoCount
+        Timber.d("activeSimCount:"+activeSimCount)
+
+        val activeSubList = subscriptionManager.activeSubscriptionInfoList
+        if (activeSubList != null) {
+            for (subscriptionInfo in activeSubList) {
+                val simSlotIndex = subscriptionInfo.simSlotIndex
+                val displayName = subscriptionInfo.displayName.toString()
+                val carrierName = subscriptionInfo.carrierName.toString()
+                val iccId = subscriptionInfo.iccId
+                val countryIso = subscriptionInfo.countryIso
+                Timber.d("simSlotIndex: $simSlotIndex, displayName: $displayName, carrierName: $carrierName, iccId: $iccId, countryIso: $countryIso"
+                )
+            }
+        }
+        val allSubList: List<SubscriptionInfo> = subscriptionManager.completeActiveSubscriptionInfoList
+        if (allSubList != null) {
+            for (subscriptionInfo in allSubList) {
+                val simSlotIndex = subscriptionInfo.simSlotIndex
+                val displayName = subscriptionInfo.displayName.toString()
+                val carrierName = subscriptionInfo.carrierName.toString()
+                val iccId = subscriptionInfo.iccId
+                val countryIso = subscriptionInfo.countryIso
+                Timber.d("simSlotIndex: $simSlotIndex, displayName: $displayName, carrierName: $carrierName, iccId: $iccId, countryIso: $countryIso"
+                )
+            }
+        }
+        val accessList = subscriptionManager.accessibleSubscriptionInfoList
+        for(subscriptionInfo in accessList){
+            val simSlotIndex = subscriptionInfo.simSlotIndex
+            val displayName = subscriptionInfo.displayName.toString()
+            val carrierName = subscriptionInfo.carrierName.toString()
+            val iccId = subscriptionInfo.iccId
+            val countryIso = subscriptionInfo.countryIso
+            Timber.d("simSlotIndex: $simSlotIndex, displayName: $displayName, carrierName: $carrierName, iccId: $iccId, countryIso: $countryIso"
+            )
+        }
+        return ""
     }
 
     fun getStatFs(): Pair<Long, Long> {
